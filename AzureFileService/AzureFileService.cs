@@ -20,7 +20,7 @@ public class AzureFileService(BlobServiceClient blobServiceClient, IOptions<Azur
     {
         var client = _blobContainerClient.GetBlobClient(id);
 
-        var options = new BlobUploadOptions
+        var uploadOptions = new BlobUploadOptions
         {
             HttpHeaders = new BlobHttpHeaders
             {
@@ -28,7 +28,7 @@ public class AzureFileService(BlobServiceClient blobServiceClient, IOptions<Azur
             }
         };
         
-        return client.UploadAsync(fileStream, options);
+        return client.UploadAsync(fileStream, uploadOptions);
     }
 
     public async Task<(Stream, FileMetadata)> GetFileAsync(string id)
@@ -40,17 +40,17 @@ public class AzureFileService(BlobServiceClient blobServiceClient, IOptions<Azur
             throw new FileNotFoundException();
         }    
         
-        var stream = await client.OpenReadAsync();
+        var downloadResponse = await client.DownloadStreamingAsync();
         
-        var properties = await client.GetPropertiesAsync();
+        var contentType = downloadResponse.Value.Details.ContentType;
         
         var metadata = new FileMetadata()
         {
             FileName = id,
-            ContentType = properties.Value.ContentType,
+            ContentType = contentType
         };
         
-        return (stream, metadata);
+        return (downloadResponse.Value.Content, metadata);
     }
 
     public Task DeleteFileAsync(string id)

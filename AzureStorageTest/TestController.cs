@@ -17,8 +17,8 @@ public class TestController(IFileStorageService fileStorageService) : Controller
     [HttpGet("get/{fileName}")]
     public async Task<IActionResult> GetFileAsync([FromRoute] string fileName)
     {
-        var (stream, metadata) = await fileStorageService.GetFileAsync(fileName);
+        var output = await fileStorageService.GetFileAsync(fileName);
         
-        return new FileStreamResult(stream, metadata.ContentType);
+        return new FileStreamResult(output.Content, output.Metadata.ContentType);
     }
 }

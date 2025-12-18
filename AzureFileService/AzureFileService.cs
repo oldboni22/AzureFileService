@@ -31,7 +31,7 @@ public class AzureFileService(BlobServiceClient blobServiceClient, IOptions<Azur
         return client.UploadAsync(fileStream, uploadOptions);
     }
 
-    public async Task<(Stream, FileMetadata)> GetFileAsync(string id)
+    public async Task<FileOutput> GetFileAsync(string id)
     {
         var client = _blobContainerClient.GetBlobClient(id);
 
@@ -50,7 +50,12 @@ public class AzureFileService(BlobServiceClient blobServiceClient, IOptions<Azur
             ContentType = contentType
         };
         
-        return (downloadResponse.Value.Content, metadata);
+        return new FileOutput
+        {
+            Content = downloadResponse.Value.Content,
+            Metadata = metadata
+            
+        };
     }
 
     public Task DeleteFileAsync(string id)

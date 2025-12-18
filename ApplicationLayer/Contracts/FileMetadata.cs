@@ -1,6 +1,6 @@
 namespace ApplicationLayer.Contracts;
 
-public struct FileMetadata
+public readonly struct FileMetadata
 {
     public string FileName { get; init; }
     

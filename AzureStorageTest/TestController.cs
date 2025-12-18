@@ -19,6 +19,6 @@ public class TestController(IFileStorageService fileStorageService) : Controller
     {
         var output = await fileStorageService.GetFileAsync(fileName);
         
-        return new FileStreamResult(output.Content, output.Metadata.ContentType);
+        return new FileStreamResult(output.Content, output.ContentType);
     }
 }

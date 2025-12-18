@@ -44,17 +44,10 @@ public class AzureFileService(BlobServiceClient blobServiceClient, IOptions<Azur
         
         var contentType = downloadResponse.Value.Details.ContentType;
         
-        var metadata = new FileMetadata()
-        {
-            FileName = id,
-            ContentType = contentType
-        };
-        
         return new FileOutput
         {
             Content = downloadResponse.Value.Content,
-            Metadata = metadata
-            
+            ContentType = contentType
         };
     }
 

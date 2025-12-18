@@ -1,8 +1,8 @@
 namespace ApplicationLayer.Contracts;
 
-public readonly struct FileOutput
+public class FileOutput
 {
-    public FileMetadata Metadata { get; init; }
+    public required string ContentType { get; init; }
     
-    public Stream Content { get; init; }
+    public required Stream Content { get; init; }
 }

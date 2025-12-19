@@ -8,7 +8,7 @@ namespace AzureStorageTest;
 public class TestController(IFileStorageService fileStorageService) : ControllerBase
 {
     [HttpPost("{fileName}")]
-    public async Task UploadFileAsync([FromForm] IFormFile file, [FromRoute] string fileName)
+    public async Task UploadFileAsync(IFormFile file, [FromRoute] string fileName)
     {
         await using var stream = file.OpenReadStream();
         await fileStorageService.UploadFileAsync(stream, fileName, file.ContentType);

@@ -12,8 +12,9 @@ public class Program
         builder.Services.AddAzureFileService(builder.Configuration);
         
         builder.Services.AddControllers();
+        builder.Services.AddSwaggerGen();
         
-        builder.Services.AddOpenApi();
+        //builder.Services.AddOpenApi();
 
         var app = builder.Build();
 
@@ -27,13 +28,15 @@ public class Program
                 context.Response.StatusCode = 500;
                 context.Response.ContentType = "application/json";
                 
-                await context.Response.WriteAsync(exception.Message);
+                await context.Response.WriteAsJsonAsync(exception.Message);
             });
         });
         
         if (app.Environment.IsDevelopment())
         {
-            app.MapOpenApi();
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            //app.MapOpenApi();
         }
         
         app.UseHttpsRedirection();

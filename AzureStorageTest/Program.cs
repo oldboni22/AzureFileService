@@ -1,5 +1,6 @@
 using AzureFileService;
 using Microsoft.AspNetCore.Diagnostics;
+using OpenTelemetry;
 
 namespace AzureStorageTest;
 
@@ -8,7 +9,8 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
+        builder.AddApplicationInsights();
+        
         builder.Services.AddAzureFileService(builder.Configuration);
         
         builder.Services.AddControllers();
@@ -17,7 +19,7 @@ public class Program
         //builder.Services.AddOpenApi();
 
         var app = builder.Build();
-
+        
         app.UseExceptionHandler(appBuilder =>
         {
             appBuilder.Run(async context =>

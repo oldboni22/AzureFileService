@@ -1,4 +1,5 @@
 using AzureFileService;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace AzureStorageTest;
 
@@ -15,6 +16,20 @@ public class Program
         builder.Services.AddOpenApi();
 
         var app = builder.Build();
+
+        app.UseExceptionHandler(appBuilder =>
+        {
+            appBuilder.Run(async context =>
+            {
+                var exceptionFeature = context.Features.Get<IExceptionHandlerFeature>();
+                var exception = exceptionFeature!.Error;
+                
+                context.Response.StatusCode = 500;
+                context.Response.ContentType = "application/json";
+                
+                await context.Response.WriteAsync(exception.Message);
+            });
+        });
         
         if (app.Environment.IsDevelopment())
         {

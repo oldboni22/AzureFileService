@@ -2,6 +2,7 @@
 using ApplicationLayer.Contracts;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
@@ -16,9 +17,9 @@ public class AzureFileService(BlobServiceClient blobServiceClient, IOptions<Azur
         _blobContainerClient.CreateIfNotExists();
     }
 
-    public Task UploadFileAsync(Stream fileStream, string id, string contentType)
+    public Task UploadFileAsync(Stream fileStream, string fileName, string contentType)
     {
-        var client = _blobContainerClient.GetBlobClient(id);
+        var client = _blobContainerClient.GetBlobClient(fileName);
 
         var uploadOptions = new BlobUploadOptions
         {
@@ -31,9 +32,22 @@ public class AzureFileService(BlobServiceClient blobServiceClient, IOptions<Azur
         return client.UploadAsync(fileStream, uploadOptions);
     }
 
-    public async Task<FileOutput> GetFileAsync(string id)
+    public async Task<string> GetFileLinkAsync(string fileName)
     {
-        var client = _blobContainerClient.GetBlobClient(id);
+        var client = _blobContainerClient.GetBlobClient(fileName);
+        
+        if (!await client.ExistsAsync())
+        {
+            throw new FileNotFoundException();
+        }  
+        
+        var sasUri = client.GenerateSasUri(BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddMinutes(5));
+        return sasUri.AbsoluteUri;
+    }
+
+    public async Task<FileOutput> GetFileAsync(string fileName)
+    {
+        var client = _blobContainerClient.GetBlobClient(fileName);
 
         if (!await client.ExistsAsync())
         {
@@ -51,9 +65,9 @@ public class AzureFileService(BlobServiceClient blobServiceClient, IOptions<Azur
         };
     }
 
-    public Task DeleteFileAsync(string id)
+    public Task DeleteFileAsync(string fileName)
     {
-        var client = _blobContainerClient.GetBlobClient(id);
+        var client = _blobContainerClient.GetBlobClient(fileName);
         
         return client.DeleteIfExistsAsync();
     }
